@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScribeMic — Free Speech to Text Dictation Online</title>
+<meta name="description" content="ScribeMic is a free speech to text dictation tool with live interim results, 18 languages, copy and .txt download. Speak naturally and watch your words appear instantly in your browser.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Inter',system-ui,sans-serif;background:#04201f;color:#e6fffa}
+.font-display{font-family:'Sora',sans-serif}
+.mic-orb{width:148px;height:148px;border-radius:9999px;background:radial-gradient(circle at 35% 30%,#22d3ee,#0e7490 55%,#134e4a);box-shadow:0 0 0 10px rgba(34,211,238,.12),0 0 60px rgba(34,211,238,.35);display:flex;align-items:center;justify-content:center;transition:all .3s}
+.mic-orb.listening{animation:pulse 1.4s ease-in-out infinite;background:radial-gradient(circle at 35% 30%,#67e8f9,#0891b2 55%,#115e59)}
+@keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 10px rgba(34,211,238,.15),0 0 60px rgba(34,211,238,.4)}50%{transform:scale(1.06);box-shadow:0 0 0 22px rgba(34,211,238,.05),0 0 90px rgba(34,211,238,.6)}}
+.wave{display:flex;gap:4px;align-items:flex-end;height:36px;justify-content:center}
+.wave span{width:5px;background:#22d3ee;border-radius:99px;height:8px;transition:height .15s}
+.wave.on span{animation:wv 0.8s ease-in-out infinite}
+.wave span:nth-child(2){animation-delay:.1s}.wave span:nth-child(3){animation-delay:.2s}.wave span:nth-child(4){animation-delay:.3s}.wave span:nth-child(5){animation-delay:.15s}.wave span:nth-child(6){animation-delay:.25s}.wave span:nth-child(7){animation-delay:.05s}
+@keyframes wv{0%,100%{height:8px}50%{height:32px}}
+.interim{color:#67e8f9;font-style:italic}
+textarea:focus,select:focus,button:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is ScribeMic really free to use?","acceptedAnswer":{"@type":"Answer","text":"Yes. ScribeMic is completely free with unlimited dictation sessions, no signup, no paywall and no watermark on exported text. You can dictate, copy and download as many transcripts as you like."}},{"@type":"Question","name":"Which browsers support ScribeMic speech recognition?","acceptedAnswer":{"@type":"Answer","text":"ScribeMic uses the Web Speech API, which is best supported in Google Chrome and Microsoft Edge on desktop and Android. Firefox and some other browsers do not yet expose speech recognition, so ScribeMic shows an honest support notice and still lets you type and edit text manually in those browsers."}},{"@type":"Question","name":"Is my voice recorded or sent to a server by ScribeMic?","acceptedAnswer":{"@type":"Answer","text":"ScribeMic itself has no server and stores nothing. Recognition is handled by your browser's built-in speech service. In Chrome that service may process audio in the cloud according to Google's policies, so avoid dictating highly sensitive information if that concerns you. Your finished transcript stays in the page until you clear it."}},{"@type":"Question","name":"How do I dictate punctuation like commas and periods?","acceptedAnswer":{"@type":"Answer","text":"Enable Smart Punctuation in ScribeMic, then say words like comma, period, question mark, exclamation mark, new line or new paragraph while you speak. ScribeMic converts those spoken commands into the matching symbols in your transcript."}},{"@type":"Question","name":"Can I dictate in languages other than English?","acceptedAnswer":{"@type":"Answer","text":"Yes. Use the language picker to choose from 18 options including Hindi, Spanish, French, German, Portuguese, Italian, Japanese, Korean, Chinese, Arabic, Russian, Dutch, Bengali, Tamil and Telugu, plus US, UK and Indian English."}},{"@type":"Question","name":"How do I save or share my transcript?","acceptedAnswer":{"@type":"Answer","text":"Click Copy to place the full transcript on your clipboard, or click Download .txt to save it as a plain text file with a dated filename. You can also select and edit the text directly in the transcript box before exporting."}}]}
+</script>
+</head>
+<body id="top">
+<header class="sticky top-0 z-50 backdrop-blur bg-[#04201f]/90 border-b border-teal-800">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2.5">
+      <span class="w-9 h-9 rounded-xl bg-cyan-400 flex items-center justify-center text-xl">🎙️</span>
+      <span class="font-display font-800 text-xl font-bold tracking-tight">Scribe<span class="text-cyan-400">Mic</span></span>
+    </a>
+    <nav class="flex items-center gap-5 text-sm font-medium">
+      <a href="#top" class="hover:text-cyan-300">Home</a>
+      <a href="https://fixoraa.tech" class="hover:text-cyan-300">More Tools</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-4 text-center">
+  <span class="inline-flex items-center gap-2 bg-teal-900 border border-teal-700 text-cyan-300 text-xs font-semibold px-3 py-1.5 rounded-full">✦ Unlimited Free Usage &nbsp;•&nbsp; No signup &nbsp;•&nbsp; No watermark</span>
+  <h1 class="font-display text-4xl sm:text-5xl font-extrabold mt-5 leading-tight">Speech to Text <span class="text-cyan-400">Dictation</span></h1>
+  <p class="text-teal-100/80 max-w-2xl mx-auto mt-4">Press the mic, speak naturally, and watch your words appear live — interim words in cyan, final text in white. Edit, copy, or download your transcript in one click.</p>
+</section>
+
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <div class="origin-top scale-[0.44] sm:scale-100 shrink-0">
+        <script>
+          atOptions = { 'key' : '4e68ac77881c17fe128a46565d9a4e8c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+        </script>
+        <script src="https://www.highrevenueformat.com/4e68ac77881c17fe128a46565d9a4e8c/invoke.js"></script>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECORDER STAGE -->
+<section class="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+  <div class="bg-[#07332f] border border-teal-800 rounded-3xl overflow-hidden shadow-2xl">
+    <div class="grid lg:grid-cols-[380px_1fr]">
+      <!-- Stage left -->
+      <div class="p-6 sm:p-8 flex flex-col items-center text-center border-b lg:border-b-0 lg:border-r border-teal-800 bg-gradient-to-b from-teal-950 to-[#07332f]">
+        <div id="supportNote" class="w-full text-left text-xs leading-relaxed rounded-xl px-3.5 py-3 mb-6 bg-amber-400/10 border border-amber-300/30 text-amber-100"></div>
+        <button id="micBtn" class="mic-orb" aria-label="Start or stop dictation">
+          <span class="text-6xl" id="micIcon">🎙️</span>
+        </button>
+        <p id="statusText" class="mt-5 font-display font-semibold text-lg">Ready to dictate</p>
+        <p id="timerText" class="text-cyan-300 font-mono text-sm mt-1">00:00</p>
+        <div class="wave mt-4" id="wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="flex gap-3 mt-6 w-full">
+          <button id="startBtn" class="flex-1 bg-cyan-400 hover:bg-cyan-300 text-teal-950 font-bold py-3 rounded-xl transition">▶ Start</button>
+          <button id="stopBtn" disabled class="flex-1 bg-teal-800 hover:bg-teal-700 disabled:opacity-40 font-bold py-3 rounded-xl transition">■ Stop</button>
+        </div>
+        <label class="block w-full text-left mt-6 text-sm font-semibold text-teal-100">Language
+          <select id="langSelect" class="mt-2 w-full bg-teal-950 border border-teal-700 rounded-xl px-3 py-2.5 text-sm text-white"></select>
+        </label>
+        <label class="flex items-center gap-2.5 mt-4 w-full text-sm cursor-pointer"><input type="checkbox" id="continuousChk" checked class="accent-cyan-400 w-4 h-4"> Keep listening (continuous mode)</label>
+        <label class="flex items-center gap-2.5 mt-3 w-full text-sm cursor-pointer"><input type="checkbox" id="punctChk" checked class="accent-cyan-400 w-4 h-4"> Smart punctuation — say “comma”, “period”, “new line”</label>
+        <label class="flex items-center gap-2.5 mt-3 w-full text-sm cursor-pointer"><input type="checkbox" id="capsChk" checked class="accent-cyan-400 w-4 h-4"> Capitalise sentence starts</label>
+        <p class="text-xs text-teal-200/60 mt-5 leading-relaxed">Tip: Chrome may ask for microphone permission the first time. Choose Allow, speak at a normal pace, and keep the mic 20–30 cm away for the cleanest transcript.</p>
+      </div>
+      <!-- Transcript right -->
+      <div class="p-6 sm:p-8">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="font-display font-bold text-lg">Your transcript</h2>
+          <div class="flex gap-2 text-xs">
+            <span class="bg-teal-900 border border-teal-700 rounded-full px-3 py-1"><b id="wordCount">0</b> words</span>
+            <span class="bg-teal-900 border border-teal-700 rounded-full px-3 py-1"><b id="charCount">0</b> chars</span>
+            <span class="bg-teal-900 border border-teal-700 rounded-full px-3 py-1"><b id="wpm">0</b> wpm</span>
+          </div>
+        </div>
+        <div id="livePreview" class="mt-4 min-h-[52px] rounded-xl bg-teal-950/70 border border-dashed border-teal-700 px-4 py-3 text-sm leading-relaxed text-teal-100/80">Live preview will appear here while you speak. <span class="interim">Words still being recognised show in cyan italics.</span></div>
+        <textarea id="transcript" rows="12" placeholder="Your dictated text will appear here. You can also click here and type or paste text to edit it manually…" class="mt-4 w-full bg-teal-950 border border-teal-700 rounded-2xl p-4 text-[15px] leading-relaxed placeholder:text-teal-200/40 resize-y"></textarea>
+        <p id="msg" class="text-sm mt-3 min-h-[20px] text-cyan-300"></p>
+        <div class="flex flex-wrap gap-3 mt-2">
+          <button id="copyBtn" class="bg-white text-teal-950 font-bold px-5 py-2.5 rounded-xl hover:bg-cyan-100 transition text-sm">📋 Copy transcript</button>
+          <button id="downloadBtn" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-5 py-2.5 rounded-xl transition text-sm">⬇ Download .txt</button>
+          <button id="clearBtn" class="bg-transparent border border-teal-600 hover:border-red-400 hover:text-red-300 font-semibold px-5 py-2.5 rounded-xl transition text-sm">Clear all</button>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mt-6 text-center text-xs">
+          <div class="bg-teal-950 rounded-xl py-3 px-2"><p class="font-display font-bold text-base text-cyan-300" id="sentCount">0</p>Sentences</div>
+          <div class="bg-teal-950 rounded-xl py-3 px-2"><p class="font-display font-bold text-base text-cyan-300" id="readTime">0 min</p>Reading time</div>
+          <div class="bg-teal-950 rounded-xl py-3 px-2"><p class="font-display font-bold text-base text-cyan-300" id="speakTime">0 min</p>Speaking time</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid sm:grid-cols-3 gap-4 mt-6 text-sm">
+    <div class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><p class="text-2xl mb-2">⚡</p><h3 class="font-display font-bold mb-1">Live interim results</h3><p class="text-teal-100/70">You see words the instant the recogniser hears them, so you can correct your pace or repeat a phrase before it is final.</p></div>
+    <div class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><p class="text-2xl mb-2">🌍</p><h3 class="font-display font-bold mb-1">18 languages</h3><p class="text-teal-100/70">From Hindi and Bengali to Japanese and Arabic — pick your language first and the recogniser tunes itself to it.</p></div>
+    <div class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><p class="text-2xl mb-2">🔒</p><h3 class="font-display font-bold mb-1">Honest about limits</h3><p class="text-teal-100/70">No fake promises. If your browser cannot do speech recognition, ScribeMic tells you plainly and still works as an editor.</p></div>
+  </div>
+</section>
+
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pb-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="464498"></script>
+    </div>
+  </div>
+</div>
+
+<!-- SEO ARTICLE -->
+<section class="mx-auto max-w-4xl px-4 sm:px-6 py-10">
+<article id="seo-article" class="prose-custom space-y-5 text-teal-50/85 leading-relaxed text-[15.5px]">
+<h2 class="font-display text-3xl font-bold text-white">Speech to Text Dictation: Turn Your Voice Into Clean, Usable Text</h2>
+<p>Speech to text dictation is one of the simplest productivity upgrades available today, yet many people still type everything by hand out of habit. Most adults speak at roughly 130 to 160 words per minute, while average typing speed sits closer to 35 to 45 words per minute. That gap means dictation can draft an email, a meeting note, an essay outline or a journal entry three to four times faster than a keyboard. ScribeMic exists to make that advantage effortless: open the page, choose your language, press the microphone, and start talking. There is nothing to install, no account to create, and no limit on how long or how often you dictate.</p>
+<p>Modern dictation is powered by the Web Speech API built into browsers such as Chrome and Edge. When you speak, the browser listens through your microphone, streams the audio to its recognition engine, and returns text in two stages. Interim results are the recogniser thinking out loud — provisional words that may still change as it hears more context. Final results are settled segments that will not change again. ScribeMic shows you both stages honestly: interim words appear in cyan italics in the live preview so you always know what is confirmed and what is still in flux. That single design choice prevents a common frustration with dictation tools, where users edit a sentence that the recogniser then rewrites underneath them.</p>
+<h3 class="font-display text-xl font-bold text-white pt-3">How to get an accurate transcript every time</h3>
+<p>Accuracy depends far more on your setup and speaking habits than on any single tool. Start with the microphone: a headset or earbuds with a built-in mic placed near your mouth will almost always beat a laptop microphone across the room. Keep the mic about twenty to thirty centimetres away, speak at a normal conversational pace, and try to keep your volume steady. Dropping your voice at the end of sentences is the number one cause of missing final words. Background noise matters too. A fan, television or open window forces the recogniser to guess, and guessing produces errors. A quiet room, even an ordinary bedroom with the door closed, dramatically improves results.</p>
+<p>Language selection is the second accuracy lever, and it is one many tools hide or ignore. Speech models are trained per language and per regional accent, so dictating Hindi words while the recogniser expects American English produces nonsense. ScribeMic puts the language picker front and centre with eighteen options, including US, UK and Indian English, Hindi, Bengali, Tamil, Telugu, Spanish, French, German, Portuguese, Italian, Dutch, Russian, Arabic, Japanese, Korean and Chinese. Pick the language you are actually speaking before you press start, and if you switch languages mid-session, stop, change the picker, and start again so the correct model loads.</p>
+<p>Punctuation deserves special attention because spoken language has none. Without punctuation commands, a dictated paragraph arrives as one long breathless sentence that takes longer to fix than it saved. With Smart Punctuation enabled in ScribeMic, you simply say the marks out loud: say comma for a comma, period or full stop for a full stop, question mark, exclamation mark, new line, and new paragraph. It feels strange for the first minute and completely natural by the fifth. Pair that with automatic capitalisation of sentence starts and your draft emerges surprisingly close to finished prose, needing only a light edit rather than a rescue operation.</p>
+<h3 class="font-display text-xl font-bold text-white pt-3">Who benefits most from dictation</h3>
+<p>Writers and students use dictation to defeat the blank page. Speaking a rough draft out loud bypasses the inner editor that stalls typing, and ideas that feel tangled in writing often untangle themselves when spoken. Journalists and researchers dictate interview summaries and field notes while details are fresh. Professionals dictate meeting notes, follow-up emails and reports between calls, turning dead time in cars, kitchens and corridors into drafted documents. For anyone with repetitive strain injury, arthritis, dyslexia, a broken arm, or any condition that makes typing painful or slow, dictation is not a convenience — it is access. The same is true for people who think faster than they type, which, honestly, is most of us.</p>
+<p>Dictation also shines for capture tasks where structure matters less than completeness: brainstorming lists, dream journals, gratitude logs, voice memos you actually want to search later, and first drafts of social posts, scripts and video voiceovers. Because ScribeMic counts words, sentences, characters, reading time and speaking time live as you talk, it doubles as a quiet coach. Podcasters and video creators can check whether a script will run about as long as intended, presenters can sanity-check talk length, and students can confirm an assignment has actually reached its word target without pasting it into a separate counter.</p>
+<h3 class="font-display text-xl font-bold text-white pt-3">An honest word about browser support and privacy</h3>
+<p>Many dictation websites pretend speech recognition works everywhere. It does not, and ScribeMic would rather tell you the truth up front. The Web Speech API is well supported in Chrome and Edge on desktop and Android, which is where dictation will feel magical. Firefox, at the time of writing, does not expose speech recognition to web pages in a generally available way, and support on some other browsers is partial or absent. When ScribeMic detects no recogniser, it shows a clear support notice at the top of the recorder stage, disables nothing else, and leaves the transcript box fully usable for typing, pasting and editing. You lose the microphone, not the tool.</p>
+<p>Privacy needs the same honesty. ScribeMic itself runs entirely in your browser: it has no server, no database and no account system, and your transcript never leaves the page unless you copy or download it yourself. However, browser speech recognition in Chrome is typically performed by a cloud service operated by the browser vendor, which means your audio may be processed on their servers under their policies. That is true of nearly every free web dictation tool, whether they admit it or not. For everyday drafts, notes and writing, most people find that trade-off fine. For legally privileged, medically sensitive or otherwise confidential material, use your judgement, consider an offline dictation system, and never dictate passwords, financial credentials or private identifiers into any web page.</p>
+<h3 class="font-display text-xl font-bold text-white pt-3">A simple workflow that works</h3>
+<p>The most reliable dictation workflow has four beats. First, outline before you record: know your opening line and your rough order of points, even if only as three bullet words on paper. Second, dictate in continuous mode, speaking in complete thoughts and using punctuation commands as you go, resisting the urge to stop and fix every small error — editing while dictating breaks your flow and your train of thought. Third, when you finish, read the transcript once out loud; your ear catches awkward phrasing and recogniser errors your eyes skim past. Fourth, export immediately: copy the text into your document, email or notes app, or download the plain text file that ScribeMic names with the date and time so a folder of dictations stays naturally organised.</p>
+<p>Expect a learning curve of about three sessions. The first session feels theatrical, the second feels plausible, and by the third most people are dictating grocery lists, messages and first drafts without thinking about the mechanics at all. Small habits compound: announcing punctuation, pausing briefly between sentences, spelling out unusual names the first time you use them, and re-speaking — rather than shouting — a phrase the recogniser missed. Shouting, by the way, genuinely makes recognition worse, because clipped, distorted audio gives the model less to work with. Calm repetition wins every time.</p>
+<p>ScribeMic was built around a recorder stage rather than a dense dashboard for a reason. Dictation is a performance, even a private one, and a big calm microphone, a clear status line, a session timer and a visible listening wave keep your attention on speaking instead of on settings. Everything else — language, continuous listening, punctuation, capitalisation — sits quietly beside the stage until you need it, and the transcript, word counts and export buttons sit on the other side, always visible. Whether you dictate one voice note a month or draft every document by voice, the goal is the same: your words, captured at the speed you think them, with no friction, no cost and no surprises.</p>
+</article>
+
+<div class="mt-12">
+<h2 class="font-display text-2xl font-bold text-white mb-5">Frequently asked questions</h2>
+<div class="space-y-3">
+<details class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><summary class="font-semibold cursor-pointer">Is ScribeMic really free to use?</summary><p class="text-teal-100/75 mt-2 text-sm leading-relaxed">Yes. ScribeMic is completely free with unlimited dictation sessions, no signup, no paywall and no watermark on exported text. You can dictate, copy and download as many transcripts as you like.</p></details>
+<details class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><summary class="font-semibold cursor-pointer">Which browsers support ScribeMic speech recognition?</summary><p class="text-teal-100/75 mt-2 text-sm leading-relaxed">ScribeMic uses the Web Speech API, which is best supported in Google Chrome and Microsoft Edge on desktop and Android. Firefox and some other browsers do not yet expose speech recognition, so ScribeMic shows an honest support notice and still lets you type and edit text manually in those browsers.</p></details>
+<details class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><summary class="font-semibold cursor-pointer">Is my voice recorded or sent to a server by ScribeMic?</summary><p class="text-teal-100/75 mt-2 text-sm leading-relaxed">ScribeMic itself has no server and stores nothing. Recognition is handled by your browser's built-in speech service. In Chrome that service may process audio in the cloud according to Google's policies, so avoid dictating highly sensitive information if that concerns you. Your finished transcript stays in the page until you clear it.</p></details>
+<details class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><summary class="font-semibold cursor-pointer">How do I dictate punctuation like commas and periods?</summary><p class="text-teal-100/75 mt-2 text-sm leading-relaxed">Enable Smart Punctuation in ScribeMic, then say words like comma, period, question mark, exclamation mark, new line or new paragraph while you speak. ScribeMic converts those spoken commands into the matching symbols in your transcript.</p></details>
+<details class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><summary class="font-semibold cursor-pointer">Can I dictate in languages other than English?</summary><p class="text-teal-100/75 mt-2 text-sm leading-relaxed">Yes. Use the language picker to choose from 18 options including Hindi, Spanish, French, German, Portuguese, Italian, Japanese, Korean, Chinese, Arabic, Russian, Dutch, Bengali, Tamil and Telugu, plus US, UK and Indian English.</p></details>
+<details class="bg-[#07332f] border border-teal-800 rounded-2xl p-5"><summary class="font-semibold cursor-pointer">How do I save or share my transcript?</summary><p class="text-teal-100/75 mt-2 text-sm leading-relaxed">Click Copy to place the full transcript on your clipboard, or click Download .txt to save it as a plain text file with a dated filename. You can also select and edit the text directly in the transcript box before exporting.</p></details>
+</div>
+</div>
+</section>
+</main>
+<footer class="border-t border-teal-800 py-8 text-center text-sm text-teal-200/50">ScribeMic — speak it, see it, save it. Free speech to text dictation in your browser.<p class="fx-credit" style="text-align:center;font-size:12.5px;opacity:.62;margin:10px auto 2px;letter-spacing:.01em">Made by <a href="https://fixoraa.tech" target="_blank" rel="noopener" style="color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px">Fixoraa</a></p>
+</footer>
+
+<script id="lib-scribemic">var ScribeMicLib = {
+  LANGUAGES: [
+    { code: "en-US", label: "English (US)" },
+    { code: "en-GB", label: "English (UK)" },
+    { code: "en-IN", label: "English (India)" },
+    { code: "hi-IN", label: "Hindi (India)" },
+    { code: "es-ES", label: "Spanish (Spain)" },
+    { code: "fr-FR", label: "French (France)" },
+    { code: "de-DE", label: "German (Germany)" },
+    { code: "pt-BR", label: "Portuguese (Brazil)" },
+    { code: "it-IT", label: "Italian (Italy)" },
+    { code: "ja-JP", label: "Japanese" },
+    { code: "ko-KR", label: "Korean" },
+    { code: "zh-CN", label: "Chinese (Simplified)" },
+    { code: "ar-SA", label: "Arabic (Saudi Arabia)" },
+    { code: "ru-RU", label: "Russian" },
+    { code: "nl-NL", label: "Dutch (Netherlands)" },
+    { code: "bn-IN", label: "Bengali (India)" },
+    { code: "ta-IN", label: "Tamil (India)" },
+    { code: "te-IN", label: "Telugu (India)" }
+  ],
+  cleanTranscript: function (text) {
+    if (text == null) return "";
+    return String(text).replace(/\s+/g, " ").trim();
+  },
+  appendFinal: function (existing, addition) {
+    var a = ScribeMicLib.cleanTranscript(existing);
+    var b = ScribeMicLib.cleanTranscript(addition);
+    if (!b) return a;
+    if (!a) return b;
+    return a + " " + b;
+  },
+  mergeDisplay: function (finalText, interimText) {
+    var f = ScribeMicLib.cleanTranscript(finalText);
+    var i = ScribeMicLib.cleanTranscript(interimText);
+    if (!i) return f;
+    if (!f) return i;
+    return f + " " + i;
+  },
+  countWords: function (text) {
+    var t = ScribeMicLib.cleanTranscript(text);
+    if (!t) return 0;
+    return t.split(" ").filter(function (w) { return w.length > 0; }).length;
+  },
+  countChars: function (text) {
+    if (text == null) return 0;
+    return String(text).length;
+  },
+  countCharsNoSpaces: function (text) {
+    if (text == null) return 0;
+    return String(text).replace(/\s/g, "").length;
+  },
+  countSentences: function (text) {
+    var t = ScribeMicLib.cleanTranscript(text);
+    if (!t) return 0;
+    var m = t.match(/[.!?]+(\s|$)/g);
+    if (m) return m.length;
+    return t ? 1 : 0;
+  },
+  readingTimeMinutes: function (wordCount) {
+    if (!wordCount || wordCount <= 0) return 0;
+    return Math.round((wordCount / 200) * 10) / 10;
+  },
+  speakingTimeMinutes: function (wordCount) {
+    if (!wordCount || wordCount <= 0) return 0;
+    return Math.round((wordCount / 150) * 10) / 10;
+  },
+  formatDuration: function (totalSeconds) {
+    var s = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+    var mm = Math.floor(s / 60);
+    var ss = s % 60;
+    return (mm < 10 ? "0" : "") + mm + ":" + (ss < 10 ? "0" : "") + ss;
+  },
+  capitalizeSentences: function (text) {
+    var t = ScribeMicLib.cleanTranscript(text);
+    if (!t) return "";
+    return t.replace(/(^\s*[a-z])|([.!?]\s+[a-z])/g, function (m) { return m.toUpperCase(); });
+  },
+  applySmartPunctuation: function (text) {
+    if (text == null) return "";
+    var t = String(text);
+    t = t.replace(/\bcomma\b/gi, ",");
+    t = t.replace(/\bperiod\b/gi, ".");
+    t = t.replace(/\bfull stop\b/gi, ".");
+    t = t.replace(/\bquestion mark\b/gi, "?");
+    t = t.replace(/\bexclamation mark\b/gi, "!");
+    t = t.replace(/\bnew line\b/gi, "\n");
+    t = t.replace(/\bnew paragraph\b/gi, "\n\n");
+    t = t.replace(/\s+([,.!?;:])/g, "$1");
+    return t;
+  },
+  isSupported: function (win) {
+    if (!win) return false;
+    return !!(win.SpeechRecognition || win.webkitSpeechRecognition);
+  },
+  supportMessage: function (supported) {
+    if (supported) return "Speech recognition is available in this browser. Click Start and allow microphone access when prompted.";
+    return "Speech recognition is not available in this browser. ScribeMic relies on the Web Speech API, which works best in Chrome and Edge on desktop and Android. Firefox and some browsers do not expose it yet — please try Chrome or Edge, or type and edit your text manually in the transcript box below.";
+  },
+  languageLabel: function (code) {
+    for (var i = 0; i < ScribeMicLib.LANGUAGES.length; i++) {
+      if (ScribeMicLib.LANGUAGES[i].code === code) return ScribeMicLib.LANGUAGES[i].label;
+    }
+    return code || "";
+  },
+  isValidLanguage: function (code) {
+    return ScribeMicLib.LANGUAGES.some(function (l) { return l.code === code; });
+  },
+  downloadFilename: function (date) {
+    var d = date instanceof Date ? date : new Date();
+    function p(n) { return (n < 10 ? "0" : "") + n; }
+    return "scribemic-transcript-" + d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes()) + ".txt";
+  },
+  wordsPerMinute: function (wordCount, elapsedSeconds) {
+    if (!elapsedSeconds || elapsedSeconds <= 0 || !wordCount) return 0;
+    return Math.round(wordCount / (elapsedSeconds / 60));
+  }
+};
+if (typeof module !== "undefined" && module.exports) { module.exports = ScribeMicLib; }
+</script>
+<script>
+(function(){
+  var L=ScribeMicLib;
+  var sel=document.getElementById('langSelect');
+  L.LANGUAGES.forEach(function(l){var o=document.createElement('option');o.value=l.code;o.textContent=l.label;sel.appendChild(o);});
+  sel.value='en-US';
+  var supported=L.isSupported(window);
+  document.getElementById('supportNote').textContent=(supported?'✓ ':'⚠ ')+L.supportMessage(supported);
+  if(!supported){document.getElementById('startBtn').disabled=true;document.getElementById('startBtn').classList.add('opacity-40');document.getElementById('statusText').textContent='Not supported in this browser — editor still works';}
+  var ta=document.getElementById('transcript'),preview=document.getElementById('livePreview'),msg=document.getElementById('msg');
+  var recog=null,listening=false,finalText='',seconds=0,timer=null,shouldRestart=false;
+  function stats(){
+    var t=ta.value;var w=L.countWords(t);
+    document.getElementById('wordCount').textContent=w;
+    document.getElementById('charCount').textContent=L.countChars(t);
+    document.getElementById('sentCount').textContent=L.countSentences(t);
+    document.getElementById('readTime').textContent=L.readingTimeMinutes(w)+' min';
+    document.getElementById('speakTime').textContent=L.speakingTimeMinutes(w)+' min';
+    document.getElementById('wpm').textContent=L.wordsPerMinute(w,seconds);
+  }
+  function setListening(on){
+    listening=on;
+    document.getElementById('micBtn').classList.toggle('listening',on);
+    document.getElementById('wave').classList.toggle('on',on);
+    document.getElementById('startBtn').disabled=on||!supported;
+    document.getElementById('stopBtn').disabled=!on;
+    document.getElementById('statusText').textContent=on?'Listening… speak now':'Ready to dictate';
+    document.getElementById('micIcon').textContent=on?'🔴':'🎙️';
+    if(on){timer=setInterval(function(){seconds++;document.getElementById('timerText').textContent=L.formatDuration(seconds);stats();},1000);}
+    else{clearInterval(timer);}
+  }
+  function start(){
+    if(!supported){msg.textContent='Speech recognition is not available here. Try Chrome or Edge, or type in the transcript box.';return;}
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    recog=new SR();recog.lang=sel.value;recog.interimResults=true;recog.continuous=document.getElementById('continuousChk').checked;recog.maxAlternatives=1;
+    shouldRestart=recog.continuous;
+    recog.onresult=function(e){
+      var interim='';
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var txt=e.results[i][0].transcript;
+        if(e.results[i].isFinal){
+          var f=txt;
+          if(document.getElementById('punctChk').checked)f=L.applySmartPunctuation(f);
+          finalText=L.appendFinal(finalText,f);
+          if(document.getElementById('capsChk').checked)finalText=L.capitalizeSentences(finalText);
+          ta.value=finalText;
+        } else interim+=txt;
+      }
+      preview.innerHTML='';
+      var s1=document.createElement('span');s1.textContent=L.mergeDisplay('',ta.value);
+      var s2=document.createElement('span');s2.className='interim';s2.textContent=interim?(' '+interim):'';
+      preview.appendChild(s1);preview.appendChild(s2);
+      stats();
+    };
+    recog.onerror=function(e){
+      if(e.error==='not-allowed'||e.error==='service-not-allowed'){msg.textContent='Microphone access was blocked. Allow microphone permission in your browser address bar, then press Start again.';shouldRestart=false;setListening(false);}
+      else if(e.error==='no-speech'){msg.textContent='No speech heard — try speaking a little louder or closer to the mic.';}
+      else if(e.error!=='aborted'){msg.textContent='Recognition note: '+e.error+'. You can press Start to try again.';}
+    };
+    recog.onend=function(){if(shouldRestart&&listening){try{recog.start();}catch(_){}}else if(listening){setListening(false);}};
+    finalText=ta.value;
+    try{recog.start();setListening(true);msg.textContent='Listening in '+L.languageLabel(sel.value)+'. Say “comma” and “period” for punctuation.';}catch(err){msg.textContent='Could not start recognition. Please try again.';}
+  }
+  function stop(){shouldRestart=false;if(recog){try{recog.stop();}catch(_){}}setListening(false);msg.textContent='Stopped. Your transcript is ready to copy, download or keep editing.';}
+  document.getElementById('startBtn').addEventListener('click',start);
+  document.getElementById('stopBtn').addEventListener('click',stop);
+  document.getElementById('micBtn').addEventListener('click',function(){listening?stop():start();});
+  sel.addEventListener('change',function(){msg.textContent='Language set to '+L.languageLabel(sel.value)+'. It applies the next time you press Start.';});
+  ta.addEventListener('input',function(){finalText=ta.value;stats();});
+  document.getElementById('copyBtn').addEventListener('click',function(){
+    if(!ta.value.trim()){msg.textContent='Nothing to copy yet — dictate or type something first.';return;}
+    function done(){msg.textContent='Transcript copied to clipboard.';}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(done).catch(function(){ta.select();document.execCommand('copy');done();});}
+    else{ta.select();document.execCommand('copy');done();}
+  });
+  document.getElementById('downloadBtn').addEventListener('click',function(){
+    if(!ta.value.trim()){msg.textContent='Nothing to download yet — dictate or type something first.';return;}
+    var blob=new Blob([ta.value],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=L.downloadFilename(new Date());document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+    msg.textContent='Transcript downloaded as .txt.';
+  });
+  document.getElementById('clearBtn').addEventListener('click',function(){
+    if(listening)stop();
+    ta.value='';finalText='';seconds=0;document.getElementById('timerText').textContent='00:00';
+    preview.textContent='Live preview will appear here while you speak.';stats();msg.textContent='Cleared. Ready for a fresh dictation.';
+  });
+  stats();
+})();
+</script>
+</body>
+</html>
